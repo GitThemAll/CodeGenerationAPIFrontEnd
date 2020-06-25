@@ -19,7 +19,7 @@
                 <div v-if="auth">
                     <strong> You have been authorized</strong><br>
                     <div id="optionsMenu" style="float: left;">
-                        <strong> Selet one of the following options.</strong>
+                        <strong>Selet one of the following options.</strong>
                         <div>
                             <button v-on:click="select('createAccount')">Create a new account</button>
                         </div>
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div v-if="option">
-                        <form style="float: right;">
+                        <div style="float: right;">
                             <div v-if="option=='createAccount'">
                                 <select id='accountTypeSelect'>
                                     <option>Checking</option>
@@ -43,29 +43,58 @@
                                 <div><button v-on:click="createAccount">Create</button></div>
                             </div>
                             <div v-if="option=='makeTransaction'">
-                                //form for making a transaction
+                                <div>
+                                    <div>
+                                        <input v-model="transactionInput.Sender"> sender
+                                    </div>
+                                    <div>
+                                        <input v-model="transactionInput.Receiver"> reciever
+                                    </div>
+                                    <div>
+                                        <input v-model="transactionInput.ReceiverName"> reciever name
+                                    </div>
+                                    <div>
+                                        <input v-model="transactionInput.Amount"> amount
+                                    </div>
+                                <div><button v-on:click="makeTransaction">Create</button></div>
+                                </div>
                             </div>
                             <div v-if="option=='editUser'">
-                                //form for editing a user
+                                <div>
+                                    <div>
+                                        sender <input v-model="userInput.email">
+                                    </div>
+                                    <div>
+                                        reciever <input v-model="userInput.password">
+                                    </div>
+                                    <div>
+                                        reciever's name <input v-model="userInput.userId">
+                                    </div>
+                                    <div>
+                                        amount <input v-model="userInput.username">
+                                    </div>
+                                    <div><button v-on:click="editUser">Create account</button></div>
+                                </div>
                             </div>
                             <div v-if="option=='deleteAccount'">
-                                //form for deleting an account
+                                Account Iban<input v-model="accountIbanToDelete">
+                                <div><button v-on:click="deleteAccount">Delete</button></div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-                <div v-if="!auth">
-                    You have not been authorized, Please check your username and password.
-                </div>
-                <div v-if=success.status>
-                    {{success.text}}
+                    <div v-if="!auth">
+                        You have not been authorized, Please check your username and password.
+                    </div>
+                    <div v-if="userMsg.status" style="float: left;">
+                        {{userMsg.text}}
+                    </div>
                 </div>
             </div>
         </div>
-        <script src="request.js"></script>
-        <script src="generalVue.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
-        </script>
+                <script src="request.js"></script>
+                <script src="generalVue.js"></script>
+                <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+                </script>
     </body>
 
 </html>
