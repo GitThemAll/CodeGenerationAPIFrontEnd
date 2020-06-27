@@ -1,5 +1,4 @@
 
-if (typeof (PostJSON) != 'function' || typeof (doHttprequest) != 'function' || typeof (GetJSON) != 'function') {
 
 	//need to check if function already exist in the project 
 	window.PostJSON = function (url, JSONObjectData, authHeader=null) {
@@ -15,9 +14,8 @@ if (typeof (PostJSON) != 'function' || typeof (doHttprequest) != 'function' || t
 	}
 
 	window.doHttprequest = function (method, responseType, url, JSONObjectData, authHeader) {
-		return new Promise (function (resolve, reject) {
+		return new Promise (function (resolve, reject) {	
 		var request = new XMLHttpRequest();
-		var data = JSON.stringify(JSONObjectData);
 		var xhr = new XMLHttpRequest();
 		xhr.withCredentials = true;
 		xhr.addEventListener("readystatechange", function() {
@@ -26,18 +24,24 @@ if (typeof (PostJSON) != 'function' || typeof (doHttprequest) != 'function' || t
 			resolve(this.responseText);
 		}
 		});
-		xhr.open("POST", url);
+		xhr.open(method, url);
 		xhr.setRequestHeader("Content-Type", "application/json");
 		if(authHeader){
 			xhr.setRequestHeader("Authorization", "Bearer "+authHeader)
 		}
+		if(JSONObjectData!=null){
+		var data = JSON.stringify(JSONObjectData);
 		xhr.send(data);
+		}
+		else{
+			xhr.send();
+		}
 		});
 	}
 
-	window.GetJSON = function (url) {
+	window.GetJSON = function (url, authHeader) {
 		return new Promise(function (resolve, reject) {
-			doHttprequest('GET', 'json', url)
+			doHttprequest('GET', 'json', url, null ,authHeader)
 				.then(function (requestResult) {
 					resolve(requestResult);
 				})
@@ -46,4 +50,27 @@ if (typeof (PostJSON) != 'function' || typeof (doHttprequest) != 'function' || t
 				});
 		});
 	}
-}
+
+	window.DeleteJSON = function (url, JSONObjectData, authHeader=null) {
+		return new Promise(function (resolve, reject) {
+			doHttprequest('DELETE', 'json', url, JSONObjectData, authHeader)
+				.then(function (requestResult) {
+					resolve(requestResult);
+				})
+				.catch(function (errorResult) {
+					reject(errorResult);
+				});
+		});
+	}
+
+	window.PutJSON = function (url, JSONObjectData, authHeader=null) {
+		return new Promise(function (resolve, reject) {
+			doHttprequest('PUT', 'json', url, JSONObjectData, authHeader)
+				.then(function (requestResult) {
+					resolve(requestResult);
+				})
+				.catch(function (errorResult) {
+					reject(errorResult);
+				});
+		});
+	}
