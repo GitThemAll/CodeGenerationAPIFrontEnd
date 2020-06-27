@@ -51,9 +51,9 @@
 		});
 	}
 
-	window.DeleteJSON = function (url, JSONObjectData, authHeader=null) {
+	window.DeleteJSON = function (url, authHeader=null) {
 		return new Promise(function (resolve, reject) {
-			doHttprequest('DELETE', 'json', url, JSONObjectData, authHeader)
+			doHttprequest('DELETE', 'json', url, null, authHeader)
 				.then(function (requestResult) {
 					resolve(requestResult);
 				})
