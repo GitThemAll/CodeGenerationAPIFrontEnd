@@ -6,223 +6,351 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
 
     <body>
 
 
         <div id="app">
-            <div>
-                <input v-model="currentUser.username">
-                <input type="password" v-model="password">
-                <button v-on:click="processLogin">Say cheese</button>
+            <div class="container-fluid">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="#">BankAPI</a>
+                    <input v-model="currentUser.username" placeholder="Username">
+                    <input type="password" v-model="password" placeholder="Password">
+                    <button v-on:click="processLogin">Say cheese</button>
+                </nav>
                 <div v-if="!loading">
-                    <div v-if="auth">
-                        <strong> You have been authorized</strong><br>
-                        <div id="optionsMenu" style="float: left;">
-                            <strong>Selet one of the following options.</strong>
-                            
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('getAllAccounts')">Get all accounts</button>
+                    <div v-if="auth==true">
+                        <div>
+                            <div class="row">
+                                <strong> You have been authorized </strong>
                             </div>
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('getAllUsers')">Get all users</button>
-                            </div>
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('createAccount')">Create a new account</button>
-                            </div>
-                            <div>
-                                <button v-on:click="select('makeTransaction')">Make a transaction</button>
-                            </div>
-                            <div>
-                                <button v-on:click="select('editUser')">Edit user</button>
-                            </div>
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('editAccount')">Edit account</button>
-                            </div>
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('deleteAccount')">Delete an existing account</button>
-                            </div>
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('getSpecificAccount')">Get a specific account information</button>
-                            </div>
-                            <div v-if="currentUser.role=='EMPLOYEE'">
-                                <button v-on:click="select('createUser')">Create new User</button>
-                            </div>
-                        </div>
-                        <div v-if="option">
-                            <div style="float: right;">
-                                <div v-if="option=='createAccount'">
-                                    <div>
-                                        <input type="number" v-model="createAccountInput.accountOwner"> userId
-                                    </div>
-                                    <select id='accountTypeSelect'>
-                                        <option>Checking</option>
-                                        <option>Saving</option>
-                                    </select>
-                                    <div><button v-on:click="createAccount">Create account</button></div>
-                                </div>
-                                <div v-if="option=='createUser'">
-                                    <div>
-                                        <input v-model="createUserInput.email"> email
-                                        <input v-model="createUserInput.password"> password
-                                        <input v-model="createUserInput.username"> username
-                                        <input type="number" v-model="createUserInput.userId"> userId
-                                    </div>
-                                    <div><button v-on:click="createUser">Create user</button></div>
-                                </div>
-                                <div v-if="option=='makeTransaction'">
-                                    <div>
-                                        <div>
-                                            <input v-model="transactionInput.Sender"> sender
+                            <div class="row">
+                                your current user information<br>
+                                Id:{{currentUser.id}}<br>
+                                accounts:
+                                <div>
+                                    <div class="col">
+                                        <div v-for="account in currentUser.accounts">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    {{account}}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <input v-model="transactionInput.Receiver"> reciever
-                                        </div>
-                                        <div>
-                                            <input v-model="transactionInput.ReceiverName"> reciever name
-                                        </div>
-                                        <div>
-                                            <input type="number" v-model="transactionInput.Amount"> amount
-                                        </div>
-                                        <div><button v-on:click="makeTransaction">Create</button></div>
                                     </div>
                                 </div>
-                                <div v-if="option=='editUser'">
-                                    <div>
-                                        <div>
-                                            Email <input v-model="userInput.email">
+                            </div>
+                            <div class="row">
+                                <div id="optionsMenu" class="fa-align-center">
+                                    <strong>Selet one of the following options.</strong>
+                                    <div class="row">
+
+                                        <div class="btn-toolbar" role="toolbar">
+                                            <div class="btn-group btn-group-lg" role="group" aria-label="First group">
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('getAllAccounts')">Get all accounts</button>
+                                                </div>
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('getAllUsers')">Get all users</button>
+                                                </div>
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('createAccount')">Create a new
+                                                        account</button>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('makeTransaction')">Make a
+                                                        transaction</button>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('editUser')">Edit user</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            Password <input v-model="userInput.password">
+                                    </div>
+                                    <div class="row">
+                                        <div class="btn-toolbar" role="toolbar">
+                                            <div class="btn-group btn-group-lg" role="group" aria-label="First group">
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('editAccount')">Edit account</button>
+                                                </div>
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('deleteAccount')">Delete an existing
+                                                        account</button>
+                                                </div>
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('getSpecificAccount')">Get a specific account
+                                                        information</button>
+                                                </div>
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('createUser')">Create new User</button>
+                                                </div>
+                                                <div v-if="currentUser.role=='EMPLOYEE'">
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('getSpecifcUserAccount')">get specific
+                                                        account by user</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                           New id <input v-model="userInput.userId">
+                                    </div>
+                                    <div class="row">
+                                        <div class="btn-toolbar" role="toolbar">
+                                            <div class="btn-group btn-group-lg" role="group" aria-label="First group">
+                                                <div>
+                                                    <button class="btn btn-outline-success custom"
+                                                        v-on:click="select('getTransactions')">Get transactions</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            Username <input v-model="userInput.username">
-                                        </div>
-                                        <div><button v-on:click="editUser">Edit user</button></div>
+
                                     </div>
                                 </div>
-                                <div v-if="option=='editAccount'">
-                                    <div>
+                            </div>
+                            <div v-if="option">
+                                <div class="row">
+                                    <div v-if="option=='createAccount'">
                                         <div>
-                                            Iban <input v-model="editAccountInput.iban">
+                                            <input type="number" v-model="createAccountInput.accountOwner"> userId
                                         </div>
-                                        <div>
-                                            Amount <input v-model="editAccountInput.amount">
-                                        </div>
-                                        <div>
-                                           Owner Id <input type="number" v-model="editAccountInput.ownerId">
-                                        </div>
-                                        <div>
-                                           Type <select v-model="editAccountInput.type">
+                                        <select id='accountTypeSelect'>
                                             <option>Checking</option>
                                             <option>Saving</option>
-                                               </select>>
-                                        </div>
-                                        <div>
-                                            Status <select v-model="editAccountInput.status">
-                                                <option>Active</option>
-                                                <option>Closed</option>
-                                                   </select>>
-                                        </div>
-                                        <div>
-                                            Transaction limit <input type="number" v-model="editAccountInput.transactionLimit">
-                                        </div>
-                                        <div>
-                                            Daily limit <input type="number" v-model="editAccountInput.dayLimit">
-                                        </div>
-                                        <div>
-                                            Absolut limit <input type="number" v-model="editAccountInput.absolutelimit">
-                                        </div>
-                                        <div><button v-on:click="editAccount">Edit account</button></div>
+                                        </select>
+                                        <div><button v-on:click="createAccount">Create account</button></div>
                                     </div>
-                                </div>
-                                <div v-if="option=='deleteAccount'">
-                                    Account Iban<input v-model="accountIbanToDelete">
-                                    <div><button v-on:click="deleteAccount">Delete</button></div>
-                                </div>
-                                <div v-if="option=='getAllAccounts' || option=='getAllUsers'">
-                                    <div>
-                                        filter<input type="number" v-model="getAllInput.filter">
-                                    </div>
-                                    <div>
-                                        offset<input type="number" v-model="getAllInput.offset">
-                                    </div>
-                                    <div v-if="option=='getAllAccounts'">
+                                    <div v-if="option=='createUser'">
                                         <div>
-                                            account Owner<input type="number" v-model="getAllInput.accountOwner">
+                                            <input v-model="createUserInput.email"> email
+                                            <input v-model="createUserInput.password"> password
+                                            <input v-model="createUserInput.username"> username
+                                            <input type="number" v-model="createUserInput.userId"> userId
+                                        </div>
+                                        <div><button v-on:click="createUser">Create user</button></div>
+                                    </div>
+                                    <div v-if="option=='getTransactions'">
+                                        Account IBAN <input v-if="currentUser.role=='EMPLOYEE'"
+                                            v-model="getTransactionsInput.IBAN">
+                                        <select v-if="currentUser.role=='CUSTOMER'" v-model="getTransactionsInput.IBAN">
+                                            <option v-for="account in currentUser.accounts">
+                                                {{account.iban}}
+                                            </option>
+                                        </select>
+                                        <button v-on:click="getTransactions">Get transactions</button>>
+                                    </div>
+                                    <div v-if="option=='makeTransaction'">
+                                        <div>
+                                            <div v-if="currentUser.role=='CUSTOMER'">
+                                                <select v-model="transactionInput.Sender">
+                                                    <option v-for="account in currentUser.accounts">
+                                                        {{account.iban}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div v-else>
+                                                <input v-model="transactionInput.Sender"> sender
+                                            </div>
+                                            <div>
+                                                <input v-model="transactionInput.Receiver"> reciever
+                                            </div>
+                                            <div>
+                                                <input v-model="transactionInput.ReceiverName"> reciever name
+                                            </div>
+                                            <div>
+                                                <input type="number" v-model="transactionInput.Amount"> amount
+                                            </div>
+                                            <div><button v-on:click="makeTransaction">Create</button></div>
+                                        </div>
+                                    </div>
+                                    <div v-if="option=='editUser'">
+                                        <div>
+                                            <div v-if="currentUser.role=='EMPLOYEE'">
+                                                User Id <input v-model="userInput.userId">
+                                            </div>
+                                            <div>
+                                                Email <input v-model="userInput.email">
+                                            </div>
+                                            <div>
+                                                Password <input v-model="userInput.password">
+                                            </div>
+                                            <div>
+                                                Username <input v-model="userInput.username">
+                                            </div>
+                                            <div><button v-on:click="editUser">
+                                                    <span v-if="currentUser.Roke=='EMPLOYEE'">Edit user</span>
+                                                    <span v-else>Edit your user </span>
+                                                </button></div>
+                                        </div>
+                                    </div>
+                                    <div v-if="option=='editAccount'">
+                                        <div>
+                                            <div>
+                                                Iban <input v-model="editAccountInput.iban">
+                                            </div>
+                                            <div>
+                                                Amount <input v-model="editAccountInput.amount">
+                                            </div>
+                                            <div>
+                                                Owner Id <input type="number" v-model="editAccountInput.ownerId">
+                                            </div>
+                                            <div>
+                                                Type <select v-model="editAccountInput.type">
+                                                    <option>Checking</option>
+                                                    <option>Saving</option>
+                                                </select>>
+                                            </div>
+                                            <div>
+                                                Status <select v-model="editAccountInput.status">
+                                                    <option>Active</option>
+                                                    <option>Closed</option>
+                                                </select>>
+                                            </div>
+                                            <div>
+                                                Transaction limit <input type="number"
+                                                    v-model="editAccountInput.transactionLimit">
+                                            </div>
+                                            <div>
+                                                Daily limit <input type="number" v-model="editAccountInput.dayLimit">
+                                            </div>
+                                            <div>
+                                                Absolut limit <input type="number"
+                                                    v-model="editAccountInput.absolutelimit">
+                                            </div>
+                                            <div><button v-on:click="editAccount">Edit account</button></div>
+                                        </div>
+                                    </div>
+                                    <div v-if="option=='deleteAccount'">
+                                        Account Iban<input v-model="accountIbanToDelete">
+                                        <div><button v-on:click="deleteAccount">Delete</button></div>
+                                    </div>
+                                    <div v-if="option=='getAllAccounts' || option=='getAllUsers'">
+                                        <div>
+                                            filter<input type="number" v-model="getAllInput.filter">
                                         </div>
                                         <div>
-                                            status <select type="number" v-model="getAllInput.status">
-                                        <option>Active</option>
-                                        <option>Closed</option>
-                                            </select>
-                                            type <select type="number" v-model="getAllInput.type">
-                                                <option>Checking</option>
-                                                <option>Saving</option>
-                                                    </select>
+                                            offset<input type="number" v-model="getAllInput.offset">
                                         </div>
+                                        <div v-if="option=='getAllAccounts'">
+                                            <div>
+                                                account Owner<input type="number" v-model="getAllInput.accountOwner">
+                                            </div>
+                                            <div>
+                                                status <select type="number" v-model="getAllInput.status">
+                                                    <option>Active</option>
+                                                    <option>Closed</option>
+                                                </select>
+                                                type <select type="number" v-model="getAllInput.type">
+                                                    <option>Checking</option>
+                                                    <option>Saving</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div><button v-if="option=='getAllAccounts'" type="number"
+                                                v-on:click="getAllAccounts">
+                                                Get Accounts</button></div>
+                                        <div><button v-if="option=='getAllUsers'" type="number"
+                                                v-on:click="getAllUsers">
+                                                Get Users</button></div>
                                     </div>
-                                    <div><button v-if="option=='getAllAccounts'" type="number" v-on:click="getAllAccounts">
-                                        Get Accounts</button></div>
-                                    <div><button v-if="option=='getAllUsers'" type="number" v-on:click="getAllUsers">
-                                        Get Users</button></div>
-                                </div>
-                                <div v-if="option=='getSpecificAccount'">
-                                    <input v-model="specificAccountInput.Iban">
-                                    <div><button v-on:click="getSpecificAccount">
-                                        Get specific account</button></div>
+                                    <div v-if="option=='getSpecificAccount'">
+                                        <input v-model="specificAccountInput.Iban">
+                                        <div><button v-on:click="getSpecificAccount">
+                                                Get specific account</button></div>
+                                    </div>
+                                    <div v-if="option=='getSpecifcUserAccount'">
+                                        <input type="number" v-model="getSpecifcUserAccountInput.id">
+                                        <div><button v-on:click="getSpecifcUserAccount">
+                                                Get specific account by userid</button></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div v-if="!auth">
-                            You have not been authorized, Please check your username and password.
+                            <div v-if="!auth">
+                                You have not been authorized, Please check your username and password.
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div v-if="userMsg.success!==null" >
-                {{userMsg.text}}
-            </div>
-            <div v-if="response.accounts" >
-                result: <br>
-                <div v-for="account in response.accounts">
-                   {{account}}
+                <div v-if="userMsg.success!==null">
+                    {{userMsg.text}}
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div v-if="response.accounts">
+                            result: <br>
+                            <div v-for="account in response.accounts">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{account}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="response.users">
+                            result: <br>
+                            <div v-for="user in response.users">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{user}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="response.newUser">
+                            result: <br>
+                            {{response.newUser}}
+                        </div>
+                        <div v-if="response.specificAccount">
+                            result: <br>
+                            {{response.specificAccount}}
+                        </div>
+                        <div v-if="response.newAccount">
+                            result: <br>
+                            {{response.newAccount}}
+                        </div>
+                        <div v-if="response.specifcUserAccounts">
+                            result: <br>
+                            <div v-for="account in response.specifcUserAccounts">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{account}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="response.transactions">
+                            result: <br>
+                            <div v-for="transaction in response.transactions">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{transaction}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                    <div v-if="auth==false">
+                        You have not been authorized by the server. check your credentials.
+                    </div>
+
                 </div>
             </div>
-            <div v-if="response.users" >
-                result: <br>
-                <div v-for="user in response.users">
-                    {{user}}
-                </div>
-            </div>
-            <div v-if="response.newUser" >
-                result: <br>
-                {{response.newUser}}
-            </div>
-            <div v-if="response.specificAccount" >
-                result: <br>
-                {{response.specificAccount}}
-            </div>
-            <div v-if="response.newAccount" >
-                result: <br>
-                {{response.newAccount}}
-            </div>
-            <div v-if="auth">
-                your current user information<br>
-                Id:{{currentUser.id}}<br>
-                accounts:
-                <div v-for="account in currentUser.accounts">
-                    {{account}}
-                </div>
-            </div>
-            <div v-if="auth==false">
-                You have not been authorized by the server. check your credentials.
-            </div>
-        </div>
         </div>
         <script src="request.js"></script>
         <script src="generalVue.js"></script>

@@ -32,10 +32,11 @@ var app = new Vue({
       "Amount": 0,
       "Performedby" : null
     },
+    getTransactionsInput:{
+    },
     userInput:{
       "email": null,
       "password": null,
-      "userId" : null,
       "username": null
     },
     createAccountInput:{
@@ -46,8 +47,10 @@ var app = new Vue({
       password:null,
       username:null,
       userId:null
-    }
-    ,
+    },
+    getSpecifcUserAccountInput:{
+      id: ""
+    },
     editAccountInput:{
       iban: null,
       amount: null,
@@ -63,7 +66,7 @@ var app = new Vue({
     },
     accountIbanToDelete:'',
     getAllInput:{
-    }
+    },
     },
     methods: {
     processLogin: function()
@@ -99,9 +102,8 @@ var app = new Vue({
             self.currentUser.id=resultJson.userId;
             self.currentUser.token=resultJson.tokenValue;
             self.assignRole(self.currentUser.token);
-            //todo
             if (self.currentUser.role=="CUSTOMER")
-            self.getAllAccounts(true);
+            self.getSpecifcUserAccount(true);
             self.loading=false;
           },
         )
@@ -126,7 +128,7 @@ var app = new Vue({
         var self=this;
         var accountType= document.getElementById("accountTypeSelect").value.toUpperCase();
         var jAccountType={ "accountType" : accountType}
-        var valid = self.validate(self.createAccountInput);
+        var valid = self.validateObject(self.createAccountInput);
         if (!valid){
           self.fillInvalidUserMsg("createAccount");
           return;
@@ -139,6 +141,7 @@ var app = new Vue({
               self.fillErrorUserMsg("createAccount");
               return  Promise.reject();
             }
+            self.refreshResponse();
             self.userMsg={
               "type" : "createAccount",
               "success": true,
@@ -160,7 +163,7 @@ var app = new Vue({
       makeTransaction: function(){
         var self= this;
         self.transactionInput.Performedby=self.currentUser.role;
-        var valid = self.validate(self.transactionInput,'transaction')
+        var valid = self.validateObject(self.transactionInput,'transaction')
         if (!valid){
         self.fillInvalidUserMsg("makeTransaction");
         return;
@@ -168,6 +171,10 @@ var app = new Vue({
       PostJSON("https://codegeneration-app.herokuapp.com/v1/bankApi/transactions", self.transactionInput, self.currentUser.token)
          .then(
           function(result) {
+            if (result==""){
+              self.fillErrorUserMsg();
+              return  Promise.reject();
+            }
             var resultJson=(JSON.parse(result));
             if (resultJson.hasOwnProperty('timestamp')){
               self.fillErrorUserMsg();
@@ -187,6 +194,7 @@ var app = new Vue({
            }
         ).then(
           function (result){
+            self.refreshResponse();
             self.userMsg={
               "type" : "makeTransaction",
               "success": true,
@@ -198,7 +206,7 @@ var app = new Vue({
       },
       editUser : function(){
         var self= this;
-        var valid = self.validate(self.userInput, 'user');
+        var valid = self.validateObject(self.userInput, 'user');
         if (!valid){
         self.fillInvalidUserMsg("editUser");
         return;
@@ -225,6 +233,7 @@ var app = new Vue({
            }
         ).then(
           function (result){
+            self.refreshResponse();
             self.userMsg={
               "type" : "editUser",
               "success": true,
@@ -244,7 +253,7 @@ var app = new Vue({
           self.fillInvalidUserMsg("deleteAccount");
           return;
         }
-        DeleteJSON("https://codegeneration-app.herokuapp.com/v1/bankApi/accounts/"+self.accountIbanToDeletej,self.currentUser.token)
+        DeleteJSON("https://codegeneration-app.herokuapp.com/v1/bankApi/accounts/"+self.accountIbanToDelete,self.currentUser.token)
          .then(
           function(result) {
             self.loading=false;
@@ -268,6 +277,7 @@ var app = new Vue({
            }
         ).then(
           function (result){
+            self.refreshResponse();
             self.userMsg={
               "type" : "deleteAccount",
               "success": true,
@@ -280,14 +290,12 @@ var app = new Vue({
       },
       getAllAccounts: function (currentUser){
         var self = this;
-        var valid= true;
-        if (!currentUser)
-        var valid = self.validate(self.getAllInput, 'filter');
+        var valid = self.validateObject(self.getAllInput, 'filter');
         if (!valid){
           self.fillInvalidUserMsg("getAllAccounts");
           return
         }
-        var queryParams =currentUser==true?"?accountOwner="+self.currentUser.id : self.convertObjectToQuery(self.getAllInput);
+        var queryParams = self.convertObjectToQuery(self.getAllInput);
         GetJSON("https://codegeneration-app.herokuapp.com/v1/bankApi/accounts"+queryParams ,self.currentUser.token)
         .then(
           function(result) {
@@ -296,10 +304,6 @@ var app = new Vue({
             if (resultJson.hasOwnProperty('timestamp')){
               self.fillErrorUserMsg();
               return  Promise.reject();
-            }
-            if (currentUser==true){
-              self.currentUser.accounts= resultJson;
-              return;
             }
             self.refreshResponse();
             self.response.accounts= resultJson;
@@ -331,7 +335,7 @@ var app = new Vue({
       },
       getAllUsers: function (){
         var self = this;
-        var valid = self.validate(self.getAllInput, 'filter');
+        var valid = self.validateObject(self.getAllInput, 'filter');
         if (!valid){
           self.fillInvalidUserMsg("getAllUsers")
           return;
@@ -410,7 +414,7 @@ var app = new Vue({
       },
       editAccount: function(){
         var self= this;
-        var valid = self.validate(self.editAccountInput, 'editAccountInput');
+        var valid = self.validateObject(self.editAccountInput, 'editAccountInput');
         if (!valid){
         self.fillInvalidUserMsg("editAccountInput");
         return;
@@ -437,6 +441,7 @@ var app = new Vue({
            }
         ).then(
           function (result){
+            self.refreshResponse();
             self.userMsg={
               "type" : "editAccount",
               "success": true,
@@ -447,7 +452,7 @@ var app = new Vue({
       },
       createUser: function(){
         var self= this;
-        var valid = self.validate(self.createUserInput, 'createUserInput');
+        var valid = self.validateObject(self.createUserInput, 'createUserInput');
         if (!valid){
         self.fillInvalidUserMsg("createUserInput");
         return;
@@ -484,7 +489,97 @@ var app = new Vue({
           }
         )
       },
-      validate: function (object,type){
+      getSpecifcUserAccount: function (currentUser){
+        var self= this;
+        var idParam= (currentUser==true) ? self.currentUser.id : self.getSpecifcUserAccountInput.id;
+        var valid = idParam=="" ? false: true;
+        if (!valid){
+        self.fillInvalidUserMsg("createUserInput");
+        return;
+        }
+        GetJSON("https://codegeneration-app.herokuapp.com/v1/bankApi/users/"+ idParam+"/accounts", self.currentUser.token)
+         .then(
+          function(result) {
+            self.loading=false;
+            if (result!=""){
+            var resultJson=(JSON.parse(result));
+            if (resultJson.hasOwnProperty('timestamp')){
+              self.fillErrorUserMsg();
+              return  Promise.reject();
+            }
+            return JSON.parse(result);
+          }
+          return  Promise.reject();
+          }, 
+          error => {
+            self.userMsg={
+              "type" : "getSpecifcUserAccount",
+              "success": false,
+              "text" : "An error occured while handling this request."
+            }
+            console.log(error);
+            self.loading=false;
+           }
+        ).then(
+          function (result){
+            self.userMsg={
+              "type" : "getSpecifcUserAccount",
+              "success": true,
+              "text" : "The request is sent and handled successfully"
+            }
+            self.refreshResponse();
+            if(currentUser==true){
+              self.currentUser.accounts= result;
+              return;
+            }
+            self.response.specifcUserAccounts= result
+          }
+        )
+      },
+      getTransactions : function (){
+        var self= this;
+        var valid = self.validateObject(self.getTransactionsInput);
+        var queryparam= self.convertObjectToQuery(self.getTransactionsInput);
+        if (!valid){
+        self.fillInvalidUserMsg("createUserInput");
+        return;
+        }
+        GetJSON("https://codegeneration-app.herokuapp.com/v1/bankApi/transactions"+queryparam, self.currentUser.token)
+         .then(
+          function(result) {
+            self.loading=false;
+            if (result!=""){
+            var resultJson=(JSON.parse(result));
+            if (resultJson.hasOwnProperty('timestamp')){
+              self.fillErrorUserMsg();
+              return  Promise.reject();
+            }
+            return JSON.parse(result);
+          }
+          return  Promise.reject();
+          }, 
+          error => {
+            self.userMsg={
+              "type" : "getTransactions",
+              "success": false,
+              "text" : "An error occured while handling this request."
+            }
+            console.log(error);
+            self.loading=false;
+           }
+        ).then(
+          function (result){
+            self.userMsg={
+              "type" : "getTransactions",
+              "success": true,
+              "text" : "The request is sent and handled successfully"
+            }
+            self.refreshResponse();
+            self.response.transactions= result;
+          }
+        )
+      },
+      validateObject: function (object,type){
         if (type !="filter" && type !="createAccountInput"){
         for (var key in object) {
           if (object[key] == null || object[key] == "")
